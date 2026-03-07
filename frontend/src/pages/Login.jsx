@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertTriangle, Crown, Shield, LogIn } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -58,37 +58,6 @@ const Login = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      // Try to login first
-      try {
-        const result = await login('admin-test@havenly.com', 'admin123');
-        if (result) {
-          navigate('/admin');
-          return;
-        }
-      } catch (loginErr) {
-        // If login fails, try to register
-        const result = await register({
-          name: 'Admin Demo',
-          email: 'admin-test@havenly.com',
-          password: 'admin123',
-          phone: '+919876543210',
-          role: 'admin'
-        });
-        if (result) {
-          navigate('/admin');
-        }
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Demo login failed. Please register manually.');
     } finally {
       setLoading(false);
     }
@@ -224,24 +193,6 @@ const Login = () => {
                   </div>
                 </div>
 
-                {selectedRole === 'admin' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleDemoLogin}
-                      disabled={loading}
-                      className="w-full btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Demo Login (Admin)
-                    </button>
-                    <p className="text-center text-sm text-slate-600 mt-4">
-                      <span className="text-xs bg-slate-100 px-3 py-1 rounded-full inline-block">
-                        Demo: admin-test@havenly.com / admin123
-                      </span>
-                    </p>
-                  </>
-                )}
-
                 {selectedRole === 'student' && (
                   <>
                     <button
@@ -371,6 +322,17 @@ const Login = () => {
         <p className="text-center text-slate-400 text-sm mt-6">
           © 2024 Havenly. All rights reserved.
         </p>
+
+        {/* Super Admin Access */}
+        <div className="text-center mt-4">
+          <button
+            onClick={() => navigate('/super-admin-login')}
+            className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center space-x-2 mx-auto"
+          >
+            <Crown size={16} />
+            <span>Super Admin Access</span>
+          </button>
+        </div>
       </div>
     </div>
   );

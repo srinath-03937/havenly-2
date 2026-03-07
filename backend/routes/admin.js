@@ -1,8 +1,9 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const { Room, User, Complaint, Transaction, Notice, db, USERS_COLLECTION, TRANSACTIONS_COLLECTION } = require('../models');
+const { Room, User, Complaint, Transaction, Notice, db, USERS_COLLECTION, ROOMS_COLLECTION, COMPLAINTS_COLLECTION, TRANSACTIONS_COLLECTION, NOTICES_COLLECTION } = require('../models');
 const { authenticate, authorize } = require('../middleware/auth');
+const admin = require('firebase-admin');
 
 const router = express.Router();
 
@@ -212,21 +213,117 @@ router.get('/stats', async (req, res) => {
     const pendingComplaints = complaints.filter(c => c.status === 'Pending').length;
     
     const transactions = await Transaction.findAll();
-    const paidTransactions = transactions.filter(t => t.status === 'Paid');
+    const paidTransactions = transactions.filter(t => t.status === 'Paid' && t.paidDate);
     const pendingTransactions = transactions.filter(t => t.status === 'Pending');
 
-    const revenueCollected = paidTransactions.reduce((sum, t) => sum + t.amount, 0);
-    const pendingDues = pendingTransactions.reduce((sum, t) => sum + t.amount, 0);
+    // Calculate revenue from actual paid transactions only - ensure numbers
+    const revenueCollected = paidTransactions.reduce((sum, t) => {
+      const amount = Number(t.amount) || 0;
+      console.log(`Adding transaction amount: ${t.amount} -> ${amount}`);
+      return sum + amount;
+    }, 0);
+    
+    const pendingDues = pendingTransactions.reduce((sum, t) => {
+      const amount = Number(t.amount) || 0;
+      console.log(`Adding pending amount: ${t.amount} -> ${amount}`);
+      return sum + amount;
+    }, 0);
+
+    console.log(`Final revenue: ${revenueCollected}, pending: ${pendingDues}`);
 
     res.json({
       occupancy: totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0,
       pendingComplaints,
-      revenueCollected,
-      pendingDues,
+      revenueCollected: Math.round(revenueCollected * 100) / 100, // Round to 2 decimal places
+      pendingDues: Math.round(pendingDues * 100) / 100,
       totalRooms,
       occupiedRooms
     });
   } catch (error) {
+    console.error('Stats calculation error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET all users (Super Admin functionality)
+router.get('/users', async (req, res) => {
+  try {
+    const usersSnapshot = await db.collection(USERS_COLLECTION).get();
+    const users = [];
+    
+    for (const doc of usersSnapshot.docs) {
+      const userData = doc.data();
+      const user = {
+        id: doc.id,
+        ...userData
+      };
+      
+      // Fetch room details if user has a room
+      if (userData.room_id) {
+        const roomDoc = await db.collection(ROOMS_COLLECTION).doc(userData.room_id).get();
+        user.room_id = roomDoc.exists ? { id: roomDoc.id, ...roomDoc.data() } : null;
+      }
+      
+      users.push(user);
+    }
+    
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// DELETE user (Super Admin functionality)
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Check if user exists
+    const userDoc = await db.collection(USERS_COLLECTION).doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const userData = userDoc.data();
+    
+    // Prevent deletion of the last admin
+    if (userData.role === 'admin') {
+      const adminCount = await db.collection(USERS_COLLECTION).where('role', '==', 'admin').get();
+      if (adminCount.size <= 1) {
+        return res.status(400).json({ message: 'Cannot delete the last admin user' });
+      }
+    }
+    
+    // If user has a room, update room occupancy
+    if (userData.room_id) {
+      await db.collection(ROOMS_COLLECTION).doc(userData.room_id).update({
+        occupancy: admin.firestore.FieldValue.increment(-1)
+      });
+    }
+    
+    // Delete user's transactions
+    const transactionsSnapshot = await db.collection(TRANSACTIONS_COLLECTION).where('user_id', '==', userId).get();
+    const batch = db.batch();
+    transactionsSnapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    // Delete user's complaints
+    const complaintsSnapshot = await db.collection(COMPLAINTS_COLLECTION).where('user_id', '==', userId).get();
+    complaintsSnapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    // Delete the user
+    batch.delete(db.collection(USERS_COLLECTION).doc(userId));
+    
+    await batch.commit();
+    
+    console.log(`User ${userId} deleted successfully`);
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
     res.status(500).json({ message: error.message });
   }
 });

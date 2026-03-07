@@ -41,7 +41,10 @@ export const adminAPI = {
   getTransactions: () => api.get('/admin/transactions'),
   getTransactionsByRoom: () => api.get('/admin/transactions-by-room'),
   createNotice: (data) => api.post('/admin/notices', data),
-  getNotices: () => api.get('/admin/notices')
+  getNotices: () => api.get('/admin/notices'),
+  // Super Admin APIs
+  getAllUsers: () => api.get('/admin/users'),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`)
 };
 
 export const studentAPI = {

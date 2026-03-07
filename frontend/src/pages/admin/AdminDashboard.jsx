@@ -9,6 +9,47 @@ const AdminDashboard = () => {
   const [loadingInsights, setLoadingInsights] = useState(false);
   const [loadingStats, setLoadingStats] = useState(true);
 
+  // Helper function to format dates safely
+  const formatDate = (dateValue) => {
+    if (!dateValue) return 'No Date';
+    
+    try {
+      let date;
+      if (dateValue.toDate) {
+        // Firebase Timestamp
+        date = dateValue.toDate();
+      } else if (dateValue instanceof Date) {
+        // JavaScript Date object
+        date = dateValue;
+      } else if (typeof dateValue === 'string') {
+        // String date
+        date = new Date(dateValue);
+      } else if (typeof dateValue === 'number') {
+        // Timestamp number
+        date = new Date(dateValue);
+      } else if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
+        // Firebase Timestamp object (alternative format)
+        date = new Date(dateValue.seconds * 1000);
+      } else {
+        return 'Invalid Date';
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error, 'for value:', dateValue);
+      return 'Invalid Date';
+    }
+  };
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -91,7 +132,7 @@ const AdminDashboard = () => {
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
             <DollarSign className="text-green-600" size={32} />
-            <span className="text-3xl font-bold text-green-600">₹{stats?.revenueCollected}</span>
+            <span className="text-3xl font-bold text-green-600">₹{Number(stats?.revenueCollected || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <p className="text-slate-600 text-sm">Revenue Collected</p>
           <p className="text-xs text-slate-500 mt-2">This month</p>
@@ -100,10 +141,10 @@ const AdminDashboard = () => {
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
             <Zap className="text-red-600" size={32} />
-            <span className="text-3xl font-bold text-red-600">₹{stats?.pendingDues}</span>
+            <span className="text-3xl font-bold text-red-600">₹{Number(stats?.pendingDues || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <p className="text-slate-600 text-sm">Pending Dues</p>
-          <p className="text-xs text-slate-500 mt-2">Outstanding payments</p>
+          <p className="text-xs text-slate-500 mt-2">Awaiting payment</p>
         </div>
       </div>
 
@@ -160,7 +201,7 @@ const AdminDashboard = () => {
                         Category: <span className="font-medium">{complaint.category}</span>
                       </span>
                       <span className="text-xs text-slate-500">
-                        {new Date(complaint.date).toLocaleDateString()}
+                        {formatDate(complaint.date)}
                       </span>
                     </div>
                   </div>

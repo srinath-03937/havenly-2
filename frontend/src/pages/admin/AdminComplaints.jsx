@@ -11,6 +11,63 @@ const AdminComplaints = () => {
   const [filterStatus, setFilterStatus] = useState('All');
   const [showHistory, setShowHistory] = useState(false);
 
+  // Helper function to format dates safely
+  const formatDate = (dateValue) => {
+    if (!dateValue) return 'No Date';
+    
+    try {
+      let date;
+      
+      // Handle Firebase Timestamp object with toDate method
+      if (dateValue && typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
+        date = dateValue.toDate();
+      }
+      // Handle Firebase Timestamp with seconds property
+      else if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
+        date = new Date(dateValue.seconds * 1000);
+      }
+      // Handle JavaScript Date
+      else if (dateValue instanceof Date) {
+        date = dateValue;
+      }
+      // Handle string
+      else if (typeof dateValue === 'string') {
+        date = new Date(dateValue);
+      }
+      // Handle number
+      else if (typeof dateValue === 'number') {
+        date = new Date(dateValue);
+      }
+      else {
+        // If it's an object but not a timestamp, try to convert
+        if (dateValue && typeof dateValue === 'object') {
+          // Try to get seconds from nested structure
+          if (dateValue._seconds || dateValue._nanoseconds) {
+            date = new Date((dateValue._seconds || 0) * 1000 + (dateValue._nanoseconds || 0) / 1000000);
+          } else {
+            return 'Invalid Date';
+          }
+        } else {
+          return 'Invalid Date';
+        }
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid Date';
+    }
+  };
+
   useEffect(() => {
     fetchComplaints();
     if (showHistory) {
@@ -22,6 +79,8 @@ const AdminComplaints = () => {
     try {
       setLoading(true);
       const response = await adminAPI.getComplaints();
+      console.log('Raw complaints data:', response.data);
+      console.log('First complaint structure:', response.data[0]);
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -180,9 +239,9 @@ const AdminComplaints = () => {
                       </div>
                       <p className="text-slate-600 mb-3">{complaint.description}</p>
                       <p className="text-xs text-slate-500">
-                        📧 {complaint.user_id?.email} | 📅 {(complaint.date && (complaint.date.toDate ? complaint.date.toDate() : new Date(complaint.date))).toLocaleDateString()}
+                        📧 {complaint.user_id?.email} | 📅 {formatDate(complaint.date)}
                         {complaint.resolvedAt && (
-                          <> | ✅ Resolved: {(complaint.resolvedAt.toDate ? complaint.resolvedAt.toDate() : new Date(complaint.resolvedAt)).toLocaleDateString()}</>
+                          <> | ✅ Resolved: {formatDate(complaint.resolvedAt)}</>
                         )}
                       </p>
                     </div>

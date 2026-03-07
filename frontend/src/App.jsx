@@ -1,17 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
+import SuperAdminLogin from './pages/SuperAdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminRooms from './pages/admin/AdminRooms';
 import AdminComplaints from './pages/admin/AdminComplaints';
 import AdminTransactions from './pages/admin/AdminTransactions';
 import AdminNotices from './pages/admin/AdminNotices';
+import SuperAdmin from './pages/admin/SuperAdmin';
 import StudentDashboard from './pages/student/StudentDashboard';
 import StudentRooms from './pages/student/StudentRooms';
 import StudentPayments from './pages/student/StudentPayments';
 import StudentComplaints from './pages/student/StudentComplaints';
 import StudentNotices from './pages/student/StudentNotices';
 import Layout from './components/Layout';
+import AdminRouteWrapper from './components/AdminRouteWrapper';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -30,6 +33,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/login" replace />;
+  }
+
+  // If Super Admin tries to access regular admin routes, redirect to Super Admin panel
+  if (user.email === 'gajula@gmail.com' && window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/super-admin')) {
+    return <Navigate to="/admin/super-admin" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -54,28 +62,32 @@ function App() {
       }}
     >
       <Routes>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to={user.role === 'admin' ? '/admin' : '/student'} />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to={user.email === 'gajula@gmail.com' ? '/admin/super-admin' : user.role === 'admin' ? '/admin' : '/student'} />} />
         
         {/* Admin Routes */}
         <Route
           path="/admin"
-          element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>}
+          element={<ProtectedRoute allowedRoles={['admin']}><AdminRouteWrapper><AdminDashboard /></AdminRouteWrapper></ProtectedRoute>}
         />
         <Route
           path="/admin/rooms"
-          element={<ProtectedRoute allowedRoles={['admin']}><AdminRooms /></ProtectedRoute>}
+          element={<ProtectedRoute allowedRoles={['admin']}><AdminRouteWrapper><AdminRooms /></AdminRouteWrapper></ProtectedRoute>}
         />
         <Route
           path="/admin/complaints"
-          element={<ProtectedRoute allowedRoles={['admin']}><AdminComplaints /></ProtectedRoute>}
+          element={<ProtectedRoute allowedRoles={['admin']}><AdminRouteWrapper><AdminComplaints /></AdminRouteWrapper></ProtectedRoute>}
         />
         <Route
           path="/admin/transactions"
-          element={<ProtectedRoute allowedRoles={['admin']}><AdminTransactions /></ProtectedRoute>}
+          element={<ProtectedRoute allowedRoles={['admin']}><AdminRouteWrapper><AdminTransactions /></AdminRouteWrapper></ProtectedRoute>}
         />
         <Route
           path="/admin/notices"
-          element={<ProtectedRoute allowedRoles={['admin']}><AdminNotices /></ProtectedRoute>}
+          element={<ProtectedRoute allowedRoles={['admin']}><AdminRouteWrapper><AdminNotices /></AdminRouteWrapper></ProtectedRoute>}
+        />
+        <Route
+          path="/admin/super-admin"
+          element={<ProtectedRoute allowedRoles={['admin']}><SuperAdmin /></ProtectedRoute>}
         />
 
         {/* Student Routes */}
@@ -101,6 +113,7 @@ function App() {
         />
 
         {/* Default Route */}
+        <Route path="/super-admin-login" element={<SuperAdminLogin />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

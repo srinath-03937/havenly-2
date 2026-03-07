@@ -97,7 +97,6 @@ const AdminTransactions = () => {
                   <th className="text-left py-3 px-4 font-semibold text-slate-900">Amount</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-900">Month</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-900">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-slate-900">Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,9 +118,6 @@ const AdminTransactions = () => {
                       }`}>
                         {transaction.status}
                       </span>
-                    </td>
-                    <td className="py-3 px-4 text-slate-600">
-                      {new Date(transaction.date).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}

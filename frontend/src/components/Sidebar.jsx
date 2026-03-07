@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, LogOut, Home, Users, AlertCircle, FileText, DollarSign, Bell, Building2 } from 'lucide-react';
+import { Menu, X, LogOut, Home, Users, AlertCircle, FileText, DollarSign, Bell, Building2, Shield } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation, Link } from 'react-router-dom';
 
@@ -7,6 +7,11 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
+
+  // Different navigation for Super Admin vs Regular Admin
+  const superAdminLinks = [
+    { label: 'Super Admin', icon: Shield, path: '/admin/super-admin' }
+  ];
 
   const adminLinks = [
     { label: 'Dashboard', icon: Home, path: '/admin' },
@@ -24,7 +29,15 @@ const Sidebar = () => {
     { label: 'Notices', icon: FileText, path: '/student/notices' }
   ];
 
-  const links = user?.role === 'admin' ? adminLinks : studentLinks;
+  // Choose navigation based on user
+  let links;
+  if (user?.email === 'gajula@gmail.com' && user?.role === 'admin') {
+    links = superAdminLinks;
+  } else if (user?.role === 'admin') {
+    links = adminLinks;
+  } else {
+    links = studentLinks;
+  }
 
   const isActive = (path) => location.pathname === path;
 

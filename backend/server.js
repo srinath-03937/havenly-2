@@ -48,13 +48,20 @@ try {
   const { User } = require('./models');
   (async () => {
     try {
-      const adminEmail = 'admin-test@dormlink.com';
-      const studentEmail = 'student-test@dormlink.com';
+      // Super Admin - only one account
+      const superAdminEmail = 'gajula@gmail.com';
+      const studentEmail = 'student-test@havenly.com';
 
-      const admin = await User.findByEmail(adminEmail);
-      if (!admin) {
-        await User.create({ name: 'Admin Demo', email: adminEmail, password: 'admin123', role: 'admin' });
-        console.log('Created demo admin account:', adminEmail);
+      const superAdmin = await User.findByEmail(superAdminEmail);
+      if (!superAdmin) {
+        await User.create({ 
+          name: 'Super Admin', 
+          email: superAdminEmail, 
+          password: 'sahithi', 
+          role: 'admin',
+          phone: '+919876543210'
+        });
+        console.log('Created super admin account:', superAdminEmail);
       }
 
       const student = await User.findByEmail(studentEmail);

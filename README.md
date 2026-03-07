@@ -1,4 +1,4 @@
-# DormFlow - Hostel/PG Management System
+# Havenly-  A Digital Hostel Management System
 
 A complete, production-ready hostel and paying guest (PG) management system built with the MERN stack (MongoDB, Express, React, Node.js) and integrated with Google Gemini AI for intelligent features.
 

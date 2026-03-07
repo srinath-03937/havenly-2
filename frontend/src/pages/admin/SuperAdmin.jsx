@@ -25,9 +25,12 @@ const SuperAdmin = () => {
     try {
       setLoading(true);
       const response = await adminAPI.getAllUsers();
-      setUsers(response.data);
+      // Ensure users is always an array
+      const usersData = Array.isArray(response.data) ? response.data : [];
+      setUsers(usersData);
     } catch (error) {
       console.error('Error fetching users:', error);
+      setUsers([]); // Set to empty array on error
     } finally {
       setLoading(false);
     }
@@ -67,12 +70,12 @@ const SuperAdmin = () => {
     setProfileUser(null);
   };
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = Array.isArray(users) ? users.filter(user => {
     const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     return matchesSearch && matchesRole;
-  });
+  }) : [];
 
   const getRoleBadge = (role) => {
     switch (role) {
@@ -128,7 +131,7 @@ const SuperAdmin = () => {
         </div>
         <div className="text-right">
           <p className="text-sm text-slate-500">Total Users</p>
-          <p className="text-3xl font-bold text-indigo-600">{users.length}</p>
+          <p className="text-3xl font-bold text-indigo-600">{Array.isArray(users) ? users.length : 0}</p>
           <button
             onClick={fetchUsers}
             className="mt-2 text-xs text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
@@ -156,7 +159,7 @@ const SuperAdmin = () => {
           <div className="flex items-center justify-between mb-4">
             <Users className="text-blue-600" size={32} />
             <span className="text-3xl font-bold text-blue-600">
-              {users.filter(u => u.role === 'student').length}
+              {Array.isArray(users) ? users.filter(u => u.role === 'student').length : 0}
             </span>
           </div>
           <p className="text-slate-600 text-sm">Students</p>
@@ -167,7 +170,7 @@ const SuperAdmin = () => {
           <div className="flex items-center justify-between mb-4">
             <Shield className="text-purple-600" size={32} />
             <span className="text-3xl font-bold text-purple-600">
-              {users.filter(u => u.role === 'admin').length}
+              {Array.isArray(users) ? users.filter(u => u.role === 'admin').length : 0}
             </span>
           </div>
           <p className="text-slate-600 text-sm">Administrators</p>
@@ -178,7 +181,7 @@ const SuperAdmin = () => {
           <div className="flex items-center justify-between mb-4">
             <AlertTriangle className="text-yellow-600" size={32} />
             <span className="text-3xl font-bold text-yellow-600">
-              {users.filter(u => !u.room_id).length}
+              {Array.isArray(users) ? users.filter(u => !u.room_id).length : 0}
             </span>
           </div>
           <p className="text-slate-600 text-sm">Unassigned</p>
@@ -189,7 +192,7 @@ const SuperAdmin = () => {
           <div className="flex items-center justify-between mb-4">
             <CheckCircle className="text-green-600" size={32} />
             <span className="text-3xl font-bold text-green-600">
-              {users.filter(u => u.room_id).length}
+              {Array.isArray(users) ? users.filter(u => u.room_id).length : 0}
             </span>
           </div>
           <p className="text-slate-600 text-sm">Assigned</p>

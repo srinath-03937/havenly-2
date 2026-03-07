@@ -35,11 +35,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // If Super Admin tries to access regular admin routes, redirect to Super Admin panel
-  if (user.email === 'gajula@gmail.com' && window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/super-admin')) {
-    return <Navigate to="/admin/super-admin" replace />;
-  }
-
   return <Layout>{children}</Layout>;
 };
 
@@ -62,7 +57,9 @@ function App() {
       }}
     >
       <Routes>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to={user.email === 'gajula@gmail.com' ? '/admin/super-admin' : user.role === 'admin' ? '/admin' : '/student'} />} />
+        {/* Login Routes */}
+        <Route path="/login" element={!user ? <Login /> : <Navigate to={user.email === 'gajula@gmail.com' ? '/admin/super-admin' : user.role === 'admin' ? '/admin' : '/student'} replace />} />
+        <Route path="/super-admin-login" element={!user ? <SuperAdminLogin /> : <Navigate to="/admin/super-admin" replace />} />
         
         {/* Admin Routes */}
         <Route
@@ -113,7 +110,6 @@ function App() {
         />
 
         {/* Default Route */}
-        <Route path="/super-admin-login" element={<SuperAdminLogin />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

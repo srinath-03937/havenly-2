@@ -49,8 +49,16 @@ const StudentRooms = () => {
       return;
     }
 
+    // Check if user already has a room
     if (userRoom) {
-      alert('You already have a room assigned. Please contact admin to change rooms.');
+      alert('You already have a room assigned. You can only book one room at a time. Please contact admin if you need to change rooms.');
+      return;
+    }
+
+    // Additional check to prevent multiple bookings
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.room_id) {
+      alert('You already have a room assigned. Students can only book one room.');
       return;
     }
 
@@ -127,9 +135,14 @@ const StudentRooms = () => {
             <Check className="text-green-600 flex-shrink-0 mt-1" size={24} />
             <div className="flex-1">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Your Current Booking</h2>
-              <p className="text-slate-600 mb-4 text-responsive-sm">
+              <p className="text-slate-600 mb-2 text-responsive-sm">
                 You are currently assigned to Room <span className="font-semibold">{userRoom.room_number}</span> in <span className="font-semibold">{userRoom.wing}</span> wing.
               </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                <p className="text-amber-800 text-sm font-medium">
+                  ⚠️ <strong>One Room Policy:</strong> Students can only book one room at a time. Please contact admin if you need to change rooms.
+                </p>
+              </div>
               <button
                 onClick={() => navigate('/student/payments')}
                 className="btn-secondary text-sm w-full sm:w-auto"
@@ -143,6 +156,9 @@ const StudentRooms = () => {
         <div className="card border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50">
           <p className="text-slate-700 font-semibold text-responsive-sm">
             👋 No room assigned yet. Select a room below to book!
+          </p>
+          <p className="text-slate-600 text-xs mt-2 text-responsive-sm">
+            Note: Students can only book one room at a time.
           </p>
         </div>
       )}
@@ -251,6 +267,10 @@ const StudentRooms = () => {
                   ) : isUserRoom ? (
                     <div className="bg-green-50 text-green-700 py-2 px-3 rounded-lg text-sm font-semibold">
                       ✓ Already Booked
+                    </div>
+                  ) : userRoom ? (
+                    <div className="bg-amber-50 text-amber-700 py-2 px-3 rounded-lg text-sm font-semibold">
+                      ⚠️ You have a room already
                     </div>
                   ) : (
                     <button

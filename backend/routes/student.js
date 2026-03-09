@@ -125,7 +125,9 @@ router.post('/rooms/:roomId/book', async (req, res) => {
     // Check if user already has a room assigned
     const existingUser = await User.findById(req.user.id);
     if (existingUser && existingUser.room_id) {
-      return res.status(400).json({ message: 'You already have a room assigned. Contact admin to change rooms.' });
+      return res.status(400).json({ 
+        message: 'You already have a room assigned. Students can only book one room at a time. Please contact admin if you need to change rooms.' 
+      });
     }
     
     // Check if room exists
@@ -139,6 +141,14 @@ router.post('/rooms/:roomId/book', async (req, res) => {
     const capacity = room.capacity || 1;
     if (occupancy >= capacity) {
       return res.status(400).json({ message: 'Room is fully occupied' });
+    }
+
+    // Additional validation: Double-check user doesn't have a room (race condition protection)
+    const userCheck = await User.findById(req.user.id);
+    if (userCheck && userCheck.room_id) {
+      return res.status(400).json({ 
+        message: 'Another booking was processed simultaneously. You can only book one room.' 
+      });
     }
 
     // Create transaction for first month's rent
@@ -188,7 +198,9 @@ router.get('/rooms/:roomId/preview', async (req, res) => {
     // Check if user already has a room assigned
     const existingUser = await User.findById(req.user.id);
     if (existingUser && existingUser.room_id) {
-      return res.status(400).json({ message: 'You already have a room assigned.' });
+      return res.status(400).json({ 
+        message: 'You already have a room assigned. Students can only book one room at a time.' 
+      });
     }
     
     // Check if room exists
@@ -203,27 +215,21 @@ router.get('/rooms/:roomId/preview', async (req, res) => {
     if (occupancy >= capacity) {
       return res.status(400).json({ message: 'Room is fully occupied' });
     }
-
-    const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
     
+    // Return booking preview
+    const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
     res.json({
-      room: {
-        id: room.id,
-        room_number: room.room_number,
-        wing: room.wing,
-        type: room.type,
-        price: room.price,
-        capacity: room.capacity,
-        occupancy: room.occupancy
-      },
-      payment: {
+      room: room,
+      bookingDetails: {
         amount: room.price,
         month: currentMonth,
-        description: `First month rent for Room ${room.room_number}`
+        type: room.type,
+        capacity: room.capacity,
+        availableSpots: capacity - occupancy
       }
     });
   } catch (error) {
-    console.error('Room preview error:', error);
+    console.error('Preview booking error:', error);
     res.status(500).json({ message: error.message });
   }
 });

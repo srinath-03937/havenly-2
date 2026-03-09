@@ -15,6 +15,7 @@ import StudentComplaints from './pages/student/StudentComplaints';
 import StudentNotices from './pages/student/StudentNotices';
 import Layout from './components/Layout';
 import AdminRouteWrapper from './components/AdminRouteWrapper';
+import TabConflictAlert from './components/TabConflictAlert';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -56,6 +57,7 @@ function App() {
         v7_relativeSplatPath: true,
       }}
     >
+      <TabConflictAlert onRefresh={() => window.location.reload()} />
       <Routes>
         {/* Login Routes */}
         <Route path="/login" element={!user ? <Login /> : <Navigate to={user.email === 'gajula@gmail.com' ? '/admin/super-admin' : user.role === 'admin' ? '/admin' : '/student'} replace />} />

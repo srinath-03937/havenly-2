@@ -4,8 +4,8 @@ import { Crown, Shield, Lock, Mail, Eye, EyeOff, AlertTriangle } from 'lucide-re
 import { useAuth } from '../hooks/useAuth';
 
 const SuperAdminLogin = () => {
-  const [email, setEmail] = useState('gajula@gmail.com');
-  const [password, setPassword] = useState('sahithi');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,11 +42,7 @@ const SuperAdminLogin = () => {
   };
 
   const handleQuickLogin = () => {
-    setEmail('gajula@gmail.com');
-    setPassword('sahithi');
-    setTimeout(() => {
-      document.getElementById('login-form').dispatchEvent(new Event('submit', { cancelable: true }));
-    }, 100);
+    // Quick login functionality removed - users must enter credentials manually
   };
 
   return (
@@ -80,7 +76,7 @@ const SuperAdminLogin = () => {
           </div>
 
           {/* Login Form */}
-          <form id="login-form" onSubmit={handleLogin} className="p-6 space-y-6">
+          <form id="login-form" onSubmit={handleLogin} className="p-6 space-y-6" autoComplete="off">
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -94,6 +90,7 @@ const SuperAdminLogin = () => {
                 className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
                 placeholder="Enter super admin email"
                 required
+                autoComplete="off"
               />
             </div>
 
@@ -111,6 +108,7 @@ const SuperAdminLogin = () => {
                   className="w-full px-4 py-3 pr-12 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
                   placeholder="Enter super admin password"
                   required
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -147,18 +145,6 @@ const SuperAdminLogin = () => {
                 </>
               )}
             </button>
-
-            {/* Quick Login */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={handleQuickLogin}
-                disabled={loading}
-                className="text-yellow-600 hover:text-yellow-700 text-sm font-medium underline disabled:opacity-50"
-              >
-                Quick Login as Super Admin
-              </button>
-            </div>
           </form>
 
           {/* Footer */}

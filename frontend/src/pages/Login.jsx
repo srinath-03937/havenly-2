@@ -20,6 +20,13 @@ const Login = () => {
     idProofType: 'Aadhar'
   });
 
+  // Clear form when role changes
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+    setError('');
+  }, [selectedRole]);
+
   const navigate = useNavigate();
   const { login, register } = useAuth();
 
@@ -141,7 +148,7 @@ const Login = () => {
 
             {!isSignUp ? (
               // Login Form
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                   <input
@@ -151,6 +158,7 @@ const Login = () => {
                     placeholder="you@example.com"
                     className="input-field"
                     required
+                    autoComplete="off"
                   />
                 </div>
 
@@ -164,6 +172,7 @@ const Login = () => {
                       placeholder="••••••••"
                       className="input-field pr-10"
                       required
+                      autoComplete="new-password"
                     />
                     <button
                       type="button"
@@ -184,38 +193,17 @@ const Login = () => {
                   <span>{loading ? 'Logging in...' : 'Login'}</span>
                 </button>
 
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-slate-500">Or try demo</span>
-                  </div>
+                {/* Demo credentials info */}
+                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
+                  <p className="text-xs text-slate-600 text-center">
+                    <span className="font-medium">Demo Credentials:</span><br/>
+                    Student: student-test@havenly.com / student123
+                  </p>
                 </div>
-
-                {selectedRole === 'student' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEmail('student-test@havenly.com');
-                        setPassword('student123');
-                      }}
-                      className="w-full btn-secondary disabled:opacity-50 disabled:cursor-not-allowed mb-2"
-                    >
-                      Auto-fill Demo Student
-                    </button>
-                    <p className="text-center text-sm text-slate-600">
-                      <span className="text-xs bg-slate-100 px-3 py-1 rounded-full inline-block">
-                        Demo: student-test@havenly.com / student123
-                      </span>
-                    </p>
-                  </>
-                )}
               </form>
             ) : (
               // Sign Up Form
-              <form onSubmit={handleSignUp} className="space-y-4 max-h-96 overflow-y-auto">
+              <form onSubmit={handleSignUp} className="space-y-4 max-h-96 overflow-y-auto" autoComplete="off">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                   <input
@@ -225,6 +213,7 @@ const Login = () => {
                     placeholder="John Doe"
                     className="input-field"
                     required
+                    autoComplete="name"
                   />
                 </div>
 
@@ -237,6 +226,7 @@ const Login = () => {
                     placeholder="you@example.com"
                     className="input-field"
                     required
+                    autoComplete="email"
                   />
                 </div>
 
@@ -249,6 +239,7 @@ const Login = () => {
                     placeholder="9876543210"
                     className="input-field"
                     required
+                    autoComplete="tel"
                   />
                 </div>
 
@@ -262,6 +253,7 @@ const Login = () => {
                       placeholder="••••••••"
                       className="input-field pr-10"
                       required
+                      autoComplete="new-password"
                     />
                     <button
                       type="button"

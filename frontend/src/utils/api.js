@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getCurrentTabToken } from './tabManager';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.PROD ? '/api' : '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

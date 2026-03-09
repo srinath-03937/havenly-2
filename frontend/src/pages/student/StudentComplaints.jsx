@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Plus, Loader, Wand2, AlertCircle, History, Clock } from 'lucide-react';
-import { studentAPI, aiAPI } from '../../utils/api';
+import { Plus, Loader, AlertCircle, History, Clock } from 'lucide-react';
+import { studentAPI } from '../../utils/api';
 
 const StudentComplaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [historyComplaints, setHistoryComplaints] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [shortDescription, setShortDescription] = useState('');
-  const [enhancedDescription, setEnhancedDescription] = useState('');
-  const [enhancingLoading, setEnhancingLoading] = useState(false);
   const [formData, setFormData] = useState({
     category: 'Maintenance',
     description: ''
   });
-  const [submitting, setSubmitting] = useState(false);
 
+  // Initialize with empty data and no loading to prevent infinite loading
   useEffect(() => {
+    // Set initial state immediately
+    setLoading(false);
+    setHistoryLoading(false);
+    
+    // Then fetch data
     fetchComplaints();
     if (showHistory) {
       fetchHistory();
@@ -29,9 +32,10 @@ const StudentComplaints = () => {
     try {
       setLoading(true);
       const response = await studentAPI.getComplaints();
-      setComplaints(response.data);
+      setComplaints(response.data || []);
     } catch (error) {
       console.error('Error fetching complaints:', error);
+      setComplaints([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -41,38 +45,13 @@ const StudentComplaints = () => {
     try {
       setHistoryLoading(true);
       const response = await studentAPI.getComplaintsHistory();
-      setHistoryComplaints(response.data);
+      setHistoryComplaints(response.data || []);
     } catch (error) {
       console.error('Error fetching complaint history:', error);
+      setHistoryComplaints([]); // Set empty array on error
     } finally {
       setHistoryLoading(false);
     }
-  };
-
-  const enhanceDescription = async () => {
-    if (!shortDescription.trim()) {
-      alert('Please enter a brief description');
-      return;
-    }
-
-    try {
-      setEnhancingLoading(true);
-      const response = await aiAPI.enhanceComplaint({ shortDescription });
-      setEnhancedDescription(response.data.enhancedDescription);
-    } catch (error) {
-      alert('Error enhancing description: ' + error.message);
-    } finally {
-      setEnhancingLoading(false);
-    }
-  };
-
-  const useEnhancedDescription = () => {
-    setFormData({
-      ...formData,
-      description: enhancedDescription
-    });
-    setEnhancedDescription('');
-    setShortDescription('');
   };
 
   const handleSubmit = async (e) => {
@@ -103,7 +82,8 @@ const StudentComplaints = () => {
     return 1;
   };
 
-  if (loading) {
+  // Only show loader if explicitly loading and not showing history
+  if (loading && !showHistory) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader className="animate-spin text-indigo-600" size={40} />
@@ -180,61 +160,6 @@ const StudentComplaints = () => {
             Lodge New Complaint
           </h2>
 
-          {/* AI Enhance Section */}
-          <div className="mb-6 p-4 bg-white rounded-lg border border-indigo-300">
-            <h3 className="font-bold text-slate-900 mb-4 flex items-center space-x-2">
-              <Wand2 size={20} className="text-indigo-600 flex-shrink-0" />
-              <span className="text-responsive-sm">AI-Powered Description Enhancement</span>
-            </h3>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Describe Your Issue Briefly (e.g., "fan is too loud", "tap is leaking")
-                </label>
-                <textarea
-                  value={shortDescription}
-                  onChange={(e) => setShortDescription(e.target.value)}
-                  placeholder="Keep it brief - AI will enhance it..."
-                  className="input-field h-16 text-base"
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={enhanceDescription}
-                disabled={enhancingLoading || !shortDescription.trim()}
-                className="btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 w-full sm:w-auto min-h-[44px]"
-              >
-                {enhancingLoading ? (
-                  <>
-                    <Loader className="animate-spin" size={20} />
-                    <span>Enhancing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Wand2 size={20} />
-                    <span>Enhance with AI</span>
-                  </>
-                )}
-              </button>
-
-              {enhancedDescription && (
-                <div className="mt-4 p-3 bg-slate-100 rounded-lg">
-                  <p className="text-sm font-medium text-slate-700 mb-2">Enhanced Description:</p>
-                  <p className="text-sm text-slate-600">{enhancedDescription}</p>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, description: enhancedDescription }))}
-                    className="mt-2 btn-primary text-sm w-full sm:w-auto"
-                  >
-                    Use This Description
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Complaint Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -250,7 +175,15 @@ const StudentComplaints = () => {
                 <option value="Cleaning">Cleaning</option>
                 <option value="Electricity">Electricity</option>
                 <option value="Plumbing">Plumbing</option>
+                <option value="WiFi">WiFi/Internet</option>
+                <option value="Water">Water Supply</option>
+                <option value="Air Conditioning">Air Conditioning</option>
                 <option value="Furniture">Furniture</option>
+                <option value="Security">Security</option>
+                <option value="Noise">Noise Issue</option>
+                <option value="Pest Control">Pest Control</option>
+                <option value="Laundry">Laundry</option>
+                <option value="Mess/Food">Mess/Food</option>
                 <option value="Other">Other</option>
               </select>
             </div>

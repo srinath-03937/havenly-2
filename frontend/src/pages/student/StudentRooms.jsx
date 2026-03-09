@@ -192,11 +192,11 @@ const StudentRooms = () => {
                     // Accept full URLs, relative server paths, and base64 data URIs
                     if (/^(https?:\/\/|data:image\/|\/)/.test(url)) return url;
                     
-                    // If it's a plain filename, serve from backend uploads
+                    // If it's a plain filename, try backend uploads but fallback to placeholder
                     if (/^[^/]+\.(jpg|jpeg|png|gif|webp)$/i.test(url)) {
-                      const uploadsUrl = `http://localhost:5000/uploads/${url}`;
-                      console.log(`Trying backend uploads URL for room ${room.room_number}:`, uploadsUrl);
-                      return uploadsUrl;
+                      // For development, just use placeholder for local files
+                      console.log(`Local file detected for room ${room.room_number}, using placeholder`);
+                      return PLACEHOLDER_SVG;
                     }
                     
                     console.warn(`Invalid photo_url format for room ${room.room_number}:`, url);

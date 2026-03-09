@@ -158,13 +158,10 @@ router.post('/rooms/:roomId/book', async (req, res) => {
       room_id: roomId,
       amount: room.price,
       month: currentMonth,
-      status: 'Pending'
+      status: 'Pending',
+      due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Due in 7 days
     });
 
-    // Simulate payment processing (in production, integrate with actual payment gateway)
-    // For now, we'll mark it as paid immediately for demo purposes
-    await Transaction.update(transaction.id, { status: 'Paid' });
-    
     // Assign room to student
     const updatedUser = await User.update(req.user.id, { room_id: roomId });
     
@@ -174,14 +171,15 @@ router.post('/rooms/:roomId/book', async (req, res) => {
     });
     
     res.json({ 
-      message: 'Room booked successfully! Payment processed.',
+      message: 'Room booked successfully! Please complete payment within 7 days.',
       room: updatedRoom,
       user: updatedUser,
       transaction: {
         id: transaction.id,
         amount: room.price,
         month: currentMonth,
-        status: 'Paid'
+        status: 'Pending',
+        due_date: transaction.due_date
       }
     });
   } catch (error) {
@@ -230,6 +228,56 @@ router.get('/rooms/:roomId/preview', async (req, res) => {
     });
   } catch (error) {
     console.error('Preview booking error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET room change requests
+router.get('/room-change-requests', async (req, res) => {
+  try {
+    // For now, return empty array - this would be implemented with a proper database
+    res.json([]);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// POST room change request
+router.post('/room-change-requests', async (req, res) => {
+  try {
+    const { current_room_id, requested_room_id, reason } = req.body;
+    
+    // Basic validation
+    if (!current_room_id || !requested_room_id || !reason) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+    
+    // For now, just return success - this would be implemented with a proper database
+    res.status(201).json({
+      id: Date.now(),
+      current_room_id,
+      requested_room_id,
+      reason,
+      status: 'Pending',
+      created_at: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// POST acknowledge notice
+router.post('/notices/:id/acknowledge', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // For now, just return success - this would be implemented with a proper database
+    res.json({
+      message: 'Notice acknowledged successfully',
+      acknowledged: true,
+      acknowledged_at: new Date().toISOString()
+    });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });

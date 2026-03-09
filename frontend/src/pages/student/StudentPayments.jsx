@@ -53,6 +53,11 @@ const StudentPayments = () => {
 
   const pendingTransactions = transactions.filter(t => t.status === 'Pending');
   const paidTransactions = transactions.filter(t => t.status === 'Paid');
+  const overdueTransactions = transactions.filter(t => {
+    if (t.status !== 'Pending') return false;
+    const dueDate = new Date(t.due_date);
+    return dueDate < new Date();
+  });
 
   return (
     <div className="space-y-8">
@@ -62,7 +67,7 @@ const StudentPayments = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="card">
           <p className="text-sm text-slate-600 mb-2">Total Payments</p>
           <p className="text-3xl font-bold text-slate-900">₹{transactions.reduce((sum, t) => sum + t.amount, 0)}</p>
@@ -71,6 +76,12 @@ const StudentPayments = () => {
           <p className="text-sm text-slate-600 mb-2">Pending Dues</p>
           <p className="text-3xl font-bold text-red-600">
             ₹{pendingTransactions.reduce((sum, t) => sum + t.amount, 0)}
+          </p>
+        </div>
+        <div className="card border-2 border-orange-200 bg-orange-50">
+          <p className="text-sm text-slate-600 mb-2">Overdue</p>
+          <p className="text-3xl font-bold text-orange-600">
+            ₹{overdueTransactions.reduce((sum, t) => sum + t.amount, 0)}
           </p>
         </div>
         <div className="card border-2 border-green-200 bg-green-50">
@@ -97,6 +108,11 @@ const StudentPayments = () => {
                   <p className="text-sm text-slate-600">
                     {transaction.room_id?.room_number ? `Room ${transaction.room_id.room_number}` : 'N/A'}
                   </p>
+                  {transaction.due_date && (
+                    <p className="text-xs text-slate-500">
+                      Due: {new Date(transaction.due_date).toLocaleDateString()}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right mr-4">
                   <p className="font-bold text-red-600">₹{transaction.amount}</p>

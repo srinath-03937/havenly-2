@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, LogOut, Home, Users, AlertCircle, FileText, DollarSign, Bell, Building2, Shield } from 'lucide-react';
+import { Menu, X, LogOut, Home, Users, AlertCircle, FileText, DollarSign, Bell, Building2, Shield, ArrowRightLeft } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation, Link } from 'react-router-dom';
 
@@ -24,6 +24,7 @@ const Sidebar = () => {
   const studentLinks = [
     { label: 'Dashboard', icon: Home, path: '/student' },
     { label: 'Rooms', icon: Building2, path: '/student/rooms' },
+    { label: 'Room Change', icon: ArrowRightLeft, path: '/student/room-change' },
     { label: 'Payments', icon: DollarSign, path: '/student/payments' },
     { label: 'Complaints', icon: AlertCircle, path: '/student/complaints' },
     { label: 'Notices', icon: FileText, path: '/student/notices' }

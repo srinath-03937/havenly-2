@@ -13,6 +13,7 @@ import StudentRooms from './pages/student/StudentRooms';
 import StudentPayments from './pages/student/StudentPayments';
 import StudentComplaints from './pages/student/StudentComplaints';
 import StudentNotices from './pages/student/StudentNotices';
+import RoomChange from './pages/student/RoomChange';
 import Layout from './components/Layout';
 import AdminRouteWrapper from './components/AdminRouteWrapper';
 import TabConflictAlert from './components/TabConflictAlert';
@@ -97,6 +98,10 @@ function App() {
         <Route
           path="/student/rooms"
           element={<ProtectedRoute allowedRoles={['student']}><StudentRooms /></ProtectedRoute>}
+        />
+        <Route
+          path="/student/room-change"
+          element={<ProtectedRoute allowedRoles={['student']}><RoomChange /></ProtectedRoute>}
         />
         <Route
           path="/student/payments"

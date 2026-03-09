@@ -58,6 +58,9 @@ export const studentAPI = {
   getComplaints: () => api.get('/student/complaints'),
   getComplaintsHistory: () => api.get('/student/complaints-history'),
   getNotices: () => api.get('/student/notices'),
+  acknowledgeNotice: (id) => api.post(`/student/notices/${id}/acknowledge`),
+  getRoomChangeRequests: () => api.get('/student/room-change-requests'),
+  requestRoomChange: (data) => api.post('/student/room-change-requests', data),
   bookRoom: (roomId) => api.post(`/student/rooms/${roomId}/book`),
   previewRoomBooking: (roomId) => api.get(`/student/rooms/${roomId}/preview`)
 };

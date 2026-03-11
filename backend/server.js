@@ -3,40 +3,36 @@ const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
 
-// Initialize Firebase - simplified for Vercel
+// Initialize Firebase - production ready
 let db;
 try {
-  console.log('Initializing Firebase...');
-  console.log('Project ID:', process.env.FIREBASE_PROJECT_ID);
-  console.log('Client Email:', process.env.FIREBASE_CLIENT_EMAIL);
+  console.log('🔥 Initializing Firebase...');
   
-  // Check if we have the required credentials
-  if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL) {
+  // For Vercel, use environment variables directly
+  if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+    
+    const serviceAccount = {
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+    };
+
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: process.env.FIREBASE_DATABASE_URL || `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
+      });
+    }
+    
+    db = admin.firestore();
+    console.log('✅ Firebase initialized successfully');
+  } else {
     throw new Error('Missing Firebase credentials');
   }
-
-  // Initialize with service account
-  const serviceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY
-  };
-
-  // Initialize Firebase Admin
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      databaseURL: process.env.FIREBASE_DATABASE_URL || `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
-    });
-  }
-  
-  db = admin.firestore();
-  console.log('✅ Firebase initialized successfully');
 } catch (error) {
   console.error('❌ Firebase initialization failed:', error.message);
-  console.error('Full error:', error);
   
-  // Create a simple mock database that returns empty results
+  // Create mock database for demo
   db = {
     collection: () => ({
       doc: () => ({
@@ -45,14 +41,14 @@ try {
         update: () => Promise.resolve({ writeTime: new Date().toISOString() }),
         delete: () => Promise.resolve()
       }),
-      add: () => Promise.resolve({ id: 'mock-' + Date.now() }),
+      add: () => Promise.resolve({ id: 'demo-' + Date.now() }),
       where: () => ({
         get: () => Promise.resolve({ docs: [] })
       }),
       get: () => Promise.resolve({ docs: [] })
     })
   };
-  console.log('⚠️ Using mock database');
+  console.log('⚠️ Using demo database');
 }
 
 // Create Express app

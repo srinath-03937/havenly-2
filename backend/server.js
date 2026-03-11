@@ -3,56 +3,56 @@ const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
 
-// Initialize Firebase with better error handling
+// Initialize Firebase - simplified for Vercel
 let db;
 try {
-  // Check if required environment variables exist
-  if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_PRIVATE_KEY || !process.env.FIREBASE_CLIENT_EMAIL) {
+  console.log('Initializing Firebase...');
+  console.log('Project ID:', process.env.FIREBASE_PROJECT_ID);
+  console.log('Client Email:', process.env.FIREBASE_CLIENT_EMAIL);
+  
+  // Check if we have the required credentials
+  if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL) {
     throw new Error('Missing Firebase credentials');
   }
 
-  // Parse the private key properly
-  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-  // Handle different private key formats
-  if (privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-    privateKey = privateKey.replace(/\\n/g, '\n').replace(/"/g, '');
-  }
-
-  const firebaseConfig = {
+  // Initialize with service account
+  const serviceAccount = {
     projectId: process.env.FIREBASE_PROJECT_ID,
-    privateKey: privateKey,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    databaseURL: process.env.FIREBASE_DATABASE_URL
+    privateKey: process.env.FIREBASE_PRIVATE_KEY
   };
 
-  // Initialize Firebase
+  // Initialize Firebase Admin
   if (!admin.apps.length) {
     admin.initializeApp({
-      credential: admin.credential.cert(firebaseConfig),
-      databaseURL: process.env.FIREBASE_DATABASE_URL
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: process.env.FIREBASE_DATABASE_URL || `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
     });
   }
   
   db = admin.firestore();
-  console.log('Firebase initialized successfully');
+  console.log('✅ Firebase initialized successfully');
 } catch (error) {
-  console.error('Firebase initialization error:', error.message);
-  // Create a mock database for development
+  console.error('❌ Firebase initialization failed:', error.message);
+  console.error('Full error:', error);
+  
+  // Create a simple mock database that returns empty results
   db = {
     collection: () => ({
       doc: () => ({
-        get: () => Promise.resolve({ exists: false }),
-        set: () => Promise.resolve(),
-        update: () => Promise.resolve(),
+        get: () => Promise.resolve({ exists: false, data: () => ({}) }),
+        set: () => Promise.resolve({ writeTime: new Date().toISOString() }),
+        update: () => Promise.resolve({ writeTime: new Date().toISOString() }),
         delete: () => Promise.resolve()
       }),
-      add: () => Promise.resolve({ id: 'mock-id' }),
+      add: () => Promise.resolve({ id: 'mock-' + Date.now() }),
       where: () => ({
         get: () => Promise.resolve({ docs: [] })
       }),
       get: () => Promise.resolve({ docs: [] })
     })
   };
+  console.log('⚠️ Using mock database');
 }
 
 // Create Express app

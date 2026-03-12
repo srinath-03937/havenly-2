@@ -3,17 +3,6 @@
   "installCommand": "cd frontend && npm install",
   "buildCommand": "cd frontend && npx vite build",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "frontend/api/auth/login.js": {
-      "runtime": "nodejs18.x"
-    },
-    "frontend/api/auth/register.js": {
-      "runtime": "nodejs18.x"
-    },
-    "frontend/api/health.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/auth/login",

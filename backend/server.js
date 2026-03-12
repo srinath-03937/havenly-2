@@ -6,11 +6,28 @@ const path = require('path');
 
 // Initialize Firebase
 try {
-  const serviceAccount = require('./serviceAccountKey.json');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://dormlink-ec53d.firebaseio.com'
-  });
+  // Read service account file
+  const fs = require('fs');
+  const serviceAccountPath = './serviceAccountKey.json';
+  
+  if (fs.existsSync(serviceAccountPath)) {
+    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+    
+    // Fix the private key formatting
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key
+        .replace(/\\n/g, '\n')
+        .replace(/-----BEGIN PRIVATE KEY-----\n/, '-----BEGIN PRIVATE KEY-----\n')
+        .replace(/\n-----END PRIVATE KEY-----/, '\n-----END PRIVATE KEY-----');
+    }
+    
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://dormlink-ec53d.firebaseio.com'
+    });
+  } else {
+    throw new Error('Service account file not found');
+  }
 } catch (error) {
   console.error('Firebase initialization error:', error.message);
   process.exit(1);

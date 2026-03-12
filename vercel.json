@@ -1,24 +1,33 @@
 {
   "version": 2,
-  "installCommand": "cd frontend && npm install",
-  "buildCommand": "cd frontend && npx vite build",
-  "outputDirectory": "frontend/dist",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/auth/login",
-      "destination": "/frontend/api/auth/login.js"
-    },
-    {
-      "source": "/api/auth/register",
-      "destination": "/frontend/api/auth/register.js"
-    },
-    {
-      "source": "/api/health",
-      "destination": "/frontend/api/health.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/index.html"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm run build",
+        "outputDirectory": "dist"
+      }
     }
-  ]
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "FIREBASE_PROJECT_ID": "dormlink-ec53d",
+    "FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@dormlink-ec53d.iam.gserviceaccount.com",
+    "FIREBASE_DATABASE_URL": "https://dormlink-ec53d.firebaseio.com",
+    "FIREBASE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDhIw3v2Ab6XkKC\nf3vBDRZwMynXzTzXGqFlw7ojkmS2Lo2bMHYYYwKL+O15EkzLLLoJ4fd4jeAh76AG\nbmsHCtvF8I5tXaymjD59dAYajHKhJ4e6cAUAEJHCr63FJnqFBv46OjcL/sxPPanw\njjvCt1H3WGbJZAiIMnBUVTdUeDaH1V6eeOHWQzdh9d9kYP4U+k8tdEaqzAsOkqwV\nOG4H99V61JYt0HuMM8HK8UM83cC/zNcDJZP0eDp06qLkXUFzHARwEnEnP5OrfX/t\nV/68PE2VWbxa6TwDusFUlg5/8TTHHXxZ5bIQfqDj0zu9iWngkICLyl5csnGselpd\nbsAUhKhzAgMBAAECggEASGA5EEROBfn8frBWC/tVnc9M4dPYfbxRa4IvGlVrLAgu\nPNgo9vEJdg8Z5KSl7GEeE6RBps9RYQeEVdz0akiq22jYmL8XDFmkkzcT6UACb91h\n7GUrrlglS8WnYuxaUd6sJvLlFGWer9C+i5dmDdRaNN6F+LNAbOxuISZeCbk1qpeq\nmp4H7E1ff3qLIVHZzEO7KU4Tqc1A0hlZPCY93igzoP40wsynhE3lqy9f9I0RLOMV\nHZetBDeSpWNoE5cDcY2a1JDTkxnxA+0LNjNEnbgCOdc7vx9+gS0ZCp+Pds4bBveo\nqUyD//VZKuBN+RbutNqnB/DUjdSK1H7hh+/GZXBtcQKBgQDzbG+fr1EVRM3x9gsf\nnIwAyrw2QirBvfR19416Me1olFLlA5/BtBb+OVDFvN/BRrbpiFahockJE611pSbU\n16iQgpdjzyN7iti3gnCUey3SBLjkl8BYYzXN1FirGPj9iXvgbHPj1WXnm4JeSgqL\nzNr0Npl94DMp4fyofSq+rAXD8QKBgQDsxMGE9BKe9zCuSnK50OabQ3hgN4eMpo2D\nF2wrO6a695rXWUgt50iih5unCdyGlCkhzJLtGXPqqyI4dMQuf1VWoUGslPLlOSIL\nUr+THhjapalxzm7Kma1bLOCxzRQOLqKH7w73jmFamCWx52EZtCmpuwjuWsPpmnAc\nIA3IzpVGowKBgCFnEtYlt4mknGIEcjhPQgLlzvffEoDtcPszEg3fhgVgvRNB8Q0i\nijkuYkAQD+A0tOrM055wVebR9W58UBzKzw2tbdq7VNIiFmTwGES3tmzoSvrLPBCk\n5IAvEE/CKICZ+g6ssyZjZQ1oEHah0FqorK7wQxW7yymHIiV4r4HklxHxAoGAPw98\nnd1vGZd5ycclUWxc/hFTpB79ic9ycTjD711vw4VU3QWn/JnK2TsuNcmTW/mURu3XQ\nICQqUnM4Dw9SfQve/869PikBtHmODrQAYD+g4QNEaRJRQdbCbEk8oz56u/hBw7Cx\nLNAYL9fcGlEE9KKegh1VmJ5GFb7TYzpKUZRr/78CgYEArye5BTKgjG2ZtC0HIOHG\nDLm/KNJc2ZUBRxuaSFe8/wL2Y85AXLzapzbCqsgrQ1sQf92dXjlN+k5ztJ41rb1v\nhtTtniwvvol1HITN8E72WoMET65Kel2jBnj5YmoUSeIZPqtPYnA+HP0CRvZH5NTI\n0PLcM2vKXoKy28sylkSNEQE=\n-----END PRIVATE KEY-----",
+    "JWT_SECRET": "dormlink_super_secret_jwt_key_2024_secure_production",
+    "GEMINI_API_KEY": "AIzaSyChBeZwGc64e3xtJuxkGk36jU-8e-njUu0",
+    "NODE_ENV": "production",
+    "VITE_API_BASE_URL": "/api"
+  }
 }

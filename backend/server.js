@@ -16,8 +16,6 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-<<<<<<< HEAD
-=======
 // Create Express app
 const app = express();
 
@@ -32,20 +30,13 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from uploads folder
 app.use('/uploads', express.static('uploads'));
 
->>>>>>> eb17cdf9e1ec76aa80040b87f6fe2d9afdfa2d84
 // Import routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const studentRoutes = require('./routes/student');
 const aiRoutes = require('./routes/ai');
 
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
+// API Routes
 // Serve static files from frontend build
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 

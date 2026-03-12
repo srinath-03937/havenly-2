@@ -6,19 +6,10 @@ const path = require('path');
 
 // Initialize Firebase
 try {
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
-  const formattedPrivateKey = privateKey
-    .replace(/\\n/g, '\n')
-    .replace(/"/g, '')
-    .trim();
-  
+  const serviceAccount = require('./serviceAccountKey.json');
   admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: formattedPrivateKey,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL
-    }),
-    databaseURL: process.env.FIREBASE_DATABASE_URL
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://dormlink-ec53d.firebaseio.com'
   });
 } catch (error) {
   console.error('Firebase initialization error:', error.message);

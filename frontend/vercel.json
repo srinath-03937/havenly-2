@@ -6,18 +6,38 @@
       "use": "@vercel/static-build",
       "config": {
         "buildCommand": "npm run build",
-        "distDir": "dist"
+        "outputDirectory": "dist"
       }
     },
     {
-      "src": "api/**/*.js",
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/auth/login.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/auth/register.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/health.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login.js"
+    },
+    {
+      "src": "/api/auth/register",
+      "dest": "/api/auth/register.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
     },
     {
       "src": "/(.*)",

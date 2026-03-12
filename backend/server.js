@@ -16,6 +16,23 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
+<<<<<<< HEAD
+=======
+// Create Express app
+const app = express();
+
+// Middleware
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from uploads folder
+app.use('/uploads', express.static('uploads'));
+
+>>>>>>> eb17cdf9e1ec76aa80040b87f6fe2d9afdfa2d84
 // Import routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');

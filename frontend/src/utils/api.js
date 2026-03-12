@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { getCurrentTabToken } from './tabManager';
 
+<<<<<<< HEAD
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+=======
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+>>>>>>> eb17cdf9e1ec76aa80040b87f6fe2d9afdfa2d84
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -8,8 +8,13 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+<<<<<<< HEAD
   ],
   "env": {
     "VITE_API_BASE_URL": "@backend_api_url"
   }
+=======
+  ]
+>>>>>>> eb17cdf9e1ec76aa80040b87f6fe2d9afdfa2d84
 }
+

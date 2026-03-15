@@ -1,211 +1,428 @@
 import { useState, useEffect } from 'react';
+
 import { Menu, X, LogOut, Home, Users, AlertCircle, FileText, DollarSign, Bell, Building2, Shield, ArrowRightLeft } from 'lucide-react';
+
 import { useAuth } from '../hooks/useAuth';
+
 import { useLocation, Link } from 'react-router-dom';
 
+
+
 const Sidebar = () => {
+
   const [isOpen, setIsOpen] = useState(false);
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   const { user, logout } = useAuth();
+
   const location = useLocation();
 
+
+
   // Handle window resize to close sidebar on desktop
+
   useEffect(() => {
+
     const handleResize = () => {
+
       if (window.innerWidth >= 768 && isOpen) {
+
         setIsOpen(false);
+
         document.body.style.overflow = 'auto';
+
       }
+
     };
+
+
 
     window.addEventListener('resize', handleResize);
+
     return () => window.removeEventListener('resize', handleResize);
+
   }, [isOpen]);
 
+
+
   // Cleanup body scroll on unmount
+
   useEffect(() => {
+
     return () => {
+
       document.body.style.overflow = 'auto';
+
     };
+
   }, []);
 
+
+
   // Different navigation for Super Admin vs Regular Admin
+
   const superAdminLinks = [
+
     { label: 'Super Admin', icon: Shield, path: '/admin/super-admin' }
+
   ];
+
+
 
   const adminLinks = [
+
     { label: 'Dashboard', icon: Home, path: '/admin' },
+
     { label: 'Rooms', icon: Users, path: '/admin/rooms' },
+
     { label: 'Complaints', icon: AlertCircle, path: '/admin/complaints' },
+
     { label: 'Transactions', icon: DollarSign, path: '/admin/transactions' },
+
     { label: 'Notices', icon: FileText, path: '/admin/notices' }
+
   ];
+
+
 
   const studentLinks = [
+
     { label: 'Dashboard', icon: Home, path: '/student' },
+
     { label: 'Rooms', icon: Building2, path: '/student/rooms' },
+
     { label: 'Room Change', icon: ArrowRightLeft, path: '/student/room-change' },
+
     { label: 'Payments', icon: DollarSign, path: '/student/payments' },
+
     { label: 'Complaints', icon: AlertCircle, path: '/student/complaints' },
+
     { label: 'Notices', icon: FileText, path: '/student/notices' }
+
   ];
 
+
+
   // Choose navigation based on user
+
   let links;
+
   if (user?.email === 'gajula@gmail.com' && user?.role === 'admin') {
+
     links = superAdminLinks;
+
   } else if (user?.role === 'admin') {
+
     links = adminLinks;
+
   } else {
+
     links = studentLinks;
+
   }
+
+
 
   const isActive = (path) => location.pathname === path;
 
+
+
   const handleLinkClick = () => {
+
     setIsOpen(false);
+
     // Close mobile menu after navigation
+
     if (window.innerWidth < 768) {
+
       document.body.style.overflow = 'auto';
+
     }
+
   };
+
+
 
   const toggleMenu = () => {
+
     // Desktop: sidebar is always visible, no toggle needed
+
     if (window.innerWidth >= 768) {
+
       return;
+
     }
+
+
 
     setIsOpen((prev) => {
+
       const next = !prev;
+
       // Prevent body scroll when menu is open on mobile
+
       document.body.style.overflow = next ? 'hidden' : 'auto';
+
       return next;
+
     });
+
   };
+
+
 
   const handleLogout = async () => {
+
     setIsLoggingOut(true);
+
     try {
+
       await logout();
+
     } catch (error) {
+
       console.error('Logout error:', error);
+
       setIsLoggingOut(false);
+
     }
+
   };
 
+
+
   return (
+
     <>
+
       {/* Mobile Toggle Button */}
+
       <button
+
         onClick={toggleMenu}
+
         className="fixed top-4 left-4 z-50 bg-indigo-600 text-white p-3 rounded-lg shadow-lg md:hidden"
+
         aria-label="Toggle navigation menu"
+
         style={{ top: 'calc(env(safe-area-inset-top, 0) + 1rem)' }}
+
       >
+
         {isOpen ? <X size={24} /> : <Menu size={24} />}
+
       </button>
 
+
+
       {/* Mobile Overlay */}
+
       {isOpen && (
+
         <div 
+
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+
           onClick={toggleMenu}
+
           aria-hidden="true"
+
         />
+
       )}
 
+
+
       {/* Sidebar */}
+
       <div
-        className={`fixed top-0 left-0 w-64 h-screen bg-slate-900 text-white p-6 transform transition-transform duration-300 z-50 md:translate-x-0 md:relative md:z-auto md:static md:h-full md:w-64 md:overflow-y-auto md:flex-shrink-0 md:pt-6 ${
+
+        className={`fixed top-0 left-0 w-64 h-screen bg-slate-900 text-white p-6 transform transition-transform duration-300 z-50 md:translate-x-0 md:relative md:z-auto md:static md:h-full md:w-64 md:overflow-y-auto md:flex-shrink-0 ${
+
           isOpen ? 'translate-x-0' : '-translate-x-full'
+
         }`}
-        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0) + 5rem)' }}
+
+        style={{ 
+
+          paddingTop: 'calc(env(safe-area-inset-top, 0) + 5rem)',
+
+          md: { paddingTop: 'calc(env(safe-area-inset-top, 0) + 1.5rem)' }
+
+        }}
+
       >
+
         <div className="flex items-center justify-between mb-8">
+
           <h1 className="text-2xl font-bold text-indigo-400">Havenly</h1>
+
           <button
+
             onClick={toggleMenu}
+
             className="md:hidden text-white hover:text-indigo-300 transition-colors"
+
             aria-label="Close menu"
+
           >
+
             <X size={24} />
+
           </button>
+
         </div>
+
+
 
         {/* User Info */}
+
         <div className="mb-6 p-4 bg-slate-800 rounded-lg">
+
           <div className="flex items-center space-x-3">
+
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+
               {user?.name?.charAt(0).toUpperCase()}
+
             </div>
+
             <div className="flex-1 min-w-0">
+
               <p className="text-white font-semibold truncate">{user?.name || 'User'}</p>
+
               <p className="text-indigo-300 text-sm capitalize">{user?.role}</p>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         {/* Navigation Links */}
+
         <nav className="space-y-2 flex-1">
+
           {links.map((link) => {
+
             const Icon = link.icon;
+
             return (
+
               <Link
+
                 key={link.path}
+
                 to={link.path}
+
                 onClick={handleLinkClick}
+
                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
+
                   isActive(link.path)
+
                     ? 'bg-indigo-600 text-white shadow-lg'
+
                     : 'hover:bg-slate-800 text-slate-100 hover:text-white'
+
                 }`}
+
               >
+
                 <Icon 
+
                   size={20} 
+
                   className={`flex-shrink-0 ${
+
                     isActive(link.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'
+
                   }`}
+
                 />
+
                 <span className="font-medium">{link.label}</span>
+
                 {isActive(link.path) && (
+
                   <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse" />
+
                 )}
+
               </Link>
+
             );
+
           })}
+
         </nav>
 
+
+
         {/* Logout Button */}
+
         <div className="pt-4 border-t border-slate-700">
+
           <button
+
             onClick={handleLogout}
+
             disabled={isLoggingOut}
+
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium group ${
+
               isLoggingOut 
+
                 ? 'bg-slate-600 text-slate-300 cursor-not-allowed' 
+
                 : 'bg-red-600 hover:bg-red-700 text-white'
+
             }`}
+
           >
+
             <LogOut 
+
               size={20} 
+
               className={`flex-shrink-0 ${isLoggingOut ? 'animate-pulse' : ''}`} 
+
             />
+
             <span>{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
+
           </button>
+
         </div>
+
+
 
         {/* Mobile Footer Info */}
+
         <div className="mt-6 pt-4 border-t border-slate-700 md:hidden">
+
           <div className="text-center text-slate-400 text-xs">
+
             <p>Havenly Hostel Management</p>
+
             <p className="mt-1">Version 1.0</p>
+
           </div>
+
         </div>
+
       </div>
+
     </>
+
   );
+
 };
 
+
+
 export default Sidebar;
+

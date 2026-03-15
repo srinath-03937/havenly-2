@@ -122,59 +122,16 @@ GEMINI_API_KEY=your-gemini-api-key
    docker run -p 5000:5000 --env-file backend/.env havenly
    ```
 
-### Vercel Deployment (Recommended - Full Stack)
-
-#### Quick Setup for Full-Stack Vercel Deployment
-
-1. **Install Vercel CLI:**
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Configure Project Structure:**
-   The project is already configured with `vercel.json` for full-stack deployment.
-
-3. **Push to GitHub:**
-   ```bash
-   git add .
-   git commit -m "Configure for Vercel deployment"
-   git push origin main
-   ```
-
-4. **Deploy to Vercel:**
-   ```bash
-   vercel --prod
-   ```
-
-5. **Configure Environment Variables in Vercel Dashboard:**
-   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-   - Add these variables:
-   ```
-   NODE_ENV=production
-   FIREBASE_PROJECT_ID=your-firebase-project-id
-   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n[your-private-key]\n-----END PRIVATE KEY-----\n"
-   FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxx@your-project.iam.gserviceaccount.com
-   FIREBASE_DATABASE_URL=https://your-project.firebaseio.com
-   JWT_SECRET=your-secret-key-change-in-production
-   GEMINI_API_KEY=your-gemini-api-key
-   ```
-
-#### Vercel Configuration Details
-- **Frontend:** React app built from `frontend/` directory
-- **Backend:** Node.js API served from `backend/` as serverless functions
-- **API Routes:** All `/api/*` requests automatically routed to backend
-- **SPA Routing:** All other requests served to frontend index.html
-- **Build Process:** Automatic build and deployment on git push
-
-#### Post-Deployment Testing
-1. **Frontend:** `https://your-project-name.vercel.app`
-2. **Backend Health:** `https://your-project-name.vercel.app/api/health`
-3. **API Endpoints:** `https://your-project-name.vercel.app/api/*`
+### Vercel Deployment (Recommended)
 
 #### Option 1: Frontend Only on Vercel + Backend on Railway/Render
 
 1. **Deploy Frontend to Vercel:**
    ```bash
+   # Install Vercel CLI
+   npm i -g vercel
+
+   # Deploy from frontend directory
    cd frontend
    vercel --prod
    ```

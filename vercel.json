@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/$1"
+    }
+  ],
+  "env": {
+    "FIREBASE_PROJECT_ID": "dormlink-ec53d",
+    "FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@dormlink-ec53d.iam.gserviceaccount.com",
+    "FIREBASE_DATABASE_URL": "https://dormlink-ec53d.firebaseio.com",
+    "JWT_SECRET": "dormlink_super_secret_jwt_key_2024_secure_production",
+    "GEMINI_API_KEY": "AIzaSyChBeZwGc64e3xtJuxkGk36jU-8e-njUu0",
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "backend/server.js": {
+      "maxDuration": 10
+    }
+  }
+}

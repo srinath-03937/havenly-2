@@ -31,7 +31,18 @@ const StudentPayments = () => {
         try {
           await studentAPI.payTransaction(id);
           await fetchTransactions();
-          alert('Payment successful!');
+          
+          // Also refresh room data to update paid rent status
+          try {
+            const userRoomRes = await studentAPI.getRoom();
+            // Update any room-related state if needed
+            console.log('Room data refreshed after payment');
+          } catch (error) {
+            // User might not have a room, which is fine
+            console.log('No room assigned to user');
+          }
+          
+          alert('Payment successful! Room rent status updated.');
         } catch (error) {
           alert('Error processing payment: ' + error.message);
         } finally {

@@ -107,15 +107,6 @@ body {
     @apply bg-white rounded-lg max-w-full w-full max-h-screen overflow-y-auto;
   }
 
-  /* Mobile navigation */
-  .nav-mobile {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-40;
-  }
-
-  .nav-sidebar-mobile {
-    @apply fixed top-0 left-0 w-64 h-screen bg-slate-900 text-white p-6 transform transition-transform duration-300;
-  }
-
   /* Touch-friendly scrollbars */
   .scrollbar-thin {
     scrollbar-width: thin;

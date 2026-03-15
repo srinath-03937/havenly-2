@@ -47,8 +47,27 @@ router.get('/pending-dues', async (req, res) => {
 // UPDATE transaction status (pay dues)
 router.put('/transactions/:id', async (req, res) => {
   try {
-    const transaction = await Transaction.update(req.params.id, { status: 'Paid' });
-    res.json(transaction);
+    // Get transaction details first
+    const transaction = await Transaction.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    // Update transaction status
+    const updatedTransaction = await Transaction.update(req.params.id, { 
+      status: 'Paid',
+      paidDate: new Date()
+    });
+
+    // Update room's paid rent status if transaction has room_id
+    if (transaction.room_id) {
+      await Room.update(transaction.room_id, {
+        paid_rent: true,
+        lastPaymentDate: new Date()
+      });
+    }
+
+    res.json(updatedTransaction);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

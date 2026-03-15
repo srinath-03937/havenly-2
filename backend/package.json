@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "cd ../frontend && npm run build",
-    "build-and-start": "npm run build && npm start"
+    "build-and-start": "npm run build && npm start",
+    "single-server": "npm run build-and-start",
+    "start-single": "start-single-server.bat"
   },
   "keywords": [
     "hostel",

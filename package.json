@@ -1,0 +1,13 @@
+{
+  "name": "havenly",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "deploy": "deploy-vercel.bat",
+    "deploy:prod": "vercel --prod"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}

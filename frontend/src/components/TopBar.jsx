@@ -1,20 +1,30 @@
-import { Bell } from 'lucide-react';
+import { Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const TopBar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const getRoleColor = (role) => {
     return role === 'admin' ? 'bg-white/15 text-white' : 'bg-white/15 text-white';
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-700 border-b border-white/10 shadow-sm sticky top-0 z-40" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-1 md:pl-64 min-h-12 flex items-center">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-3 min-h-16 flex items-center">
         <div className="w-full flex items-center justify-between">
-          {/* Welcome Message - Hidden on mobile, visible on desktop */}
-          <div className="hidden md:block">
-            <h2 className="text-white font-semibold text-responsive">Welcome back!</h2>
+          {/* Left Side - Space for mobile toggle button */}
+          <div className="flex items-center space-x-4">
+            {/* Spacer for mobile toggle button - only visible on mobile */}
+            <div className="md:hidden w-12 h-12"></div>
+            
+            {/* Welcome Message - Hidden on mobile, visible on desktop */}
+            <div className="hidden md:block">
+              <h2 className="text-white font-semibold text-responsive">Welcome back!</h2>
+            </div>
           </div>
 
           {/* Right Side Actions */}
@@ -26,6 +36,15 @@ const TopBar = () => {
             >
               <Bell size={20} className="sm:size-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            {/* Sign Out - Visible on mobile */}
+            <button 
+              onClick={handleLogout}
+              className="md:hidden text-white/90 hover:text-white transition p-2 rounded-lg hover:bg-white/10"
+              aria-label="Sign out"
+            >
+              <LogOut size={20} />
             </button>
 
             {/* User Profile */}

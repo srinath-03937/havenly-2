@@ -1,12 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, Home, Users, AlertCircle, FileText, DollarSign, Bell, Building2, Shield, ArrowRightLeft } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation, Link } from 'react-router-dom';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
+
+  // Handle window resize to close sidebar on desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isOpen) {
+        setIsOpen(false);
+        document.body.style.overflow = 'auto';
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isOpen]);
+
+  // Cleanup body scroll on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
   // Different navigation for Super Admin vs Regular Admin
   const superAdminLinks = [
@@ -64,10 +85,14 @@ const Sidebar = () => {
     });
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-    document.body.style.overflow = 'auto';
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -75,8 +100,9 @@ const Sidebar = () => {
       {/* Mobile Toggle Button */}
       <button
         onClick={toggleMenu}
-        className="fixed-mobile z-50 bg-indigo-600 text-white p-3 rounded-lg shadow-lg md:hidden"
+        className="fixed top-4 left-4 z-50 bg-indigo-600 text-white p-3 rounded-lg shadow-lg md:hidden"
         aria-label="Toggle navigation menu"
+        style={{ top: 'calc(env(safe-area-inset-top, 0) + 1rem)' }}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -84,7 +110,7 @@ const Sidebar = () => {
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="nav-mobile md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={toggleMenu}
           aria-hidden="true"
         />
@@ -92,7 +118,10 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`nav-sidebar-mobile ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:z-auto md:h-full md:w-64 md:overflow-y-auto md:flex-shrink-0`}
+        className={`fixed top-0 left-0 w-64 h-screen bg-slate-900 text-white p-6 transform transition-transform duration-300 z-50 md:translate-x-0 md:relative md:z-auto md:static md:h-full md:w-64 md:overflow-y-auto md:flex-shrink-0 md:pt-6 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0) + 5rem)' }}
       >
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-indigo-400">Havenly</h1>
@@ -152,10 +181,18 @@ const Sidebar = () => {
         <div className="pt-4 border-t border-slate-700">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 text-white font-medium group"
+            disabled={isLoggingOut}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium group ${
+              isLoggingOut 
+                ? 'bg-slate-600 text-slate-300 cursor-not-allowed' 
+                : 'bg-red-600 hover:bg-red-700 text-white'
+            }`}
           >
-            <LogOut size={20} className="flex-shrink-0" />
-            <span>Sign Out</span>
+            <LogOut 
+              size={20} 
+              className={`flex-shrink-0 ${isLoggingOut ? 'animate-pulse' : ''}`} 
+            />
+            <span>{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
           </button>
         </div>
 

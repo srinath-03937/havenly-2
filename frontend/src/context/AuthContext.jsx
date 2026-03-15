@@ -104,6 +104,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     clearCurrentTabAuth();
+    
+    // Notify other tabs about logout
+    localStorage.setItem('auth_logout', Date.now().toString());
+    
+    // Redirect to login page
+    window.location.href = '/login';
   }, [tabId]);
 
   return (

@@ -88,9 +88,9 @@ const StudentRooms = () => {
       setBookingStatus('success');
       setShowPaymentModal(false);
       
-      // Refresh data after a short delay
-      setTimeout(() => {
-        fetchRoomsAndUserData();
+      // Refresh data after a short delay to get updated room status
+      setTimeout(async () => {
+        await fetchRoomsAndUserData();
         setBookingStatus(null);
         setSelectedRoom(null);
         setPaymentPreview(null);
@@ -138,6 +138,16 @@ const StudentRooms = () => {
               <p className="text-slate-600 mb-2 text-responsive-sm">
                 You are currently assigned to Room <span className="font-semibold">{userRoom.room_number}</span> in <span className="font-semibold">{userRoom.wing}</span> wing.
               </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                <p className="text-blue-800 text-sm font-medium">
+                  💰 <strong>Rent Status:</strong> {userRoom.paid_rent ? '✅ Paid' : '⏳ Pending'}
+                </p>
+                {userRoom.lastPaymentDate && (
+                  <p className="text-blue-600 text-xs mt-1">
+                    Last payment: {new Date(userRoom.lastPaymentDate.toDate ? userRoom.lastPaymentDate.toDate() : userRoom.lastPaymentDate).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
                 <p className="text-amber-800 text-sm font-medium">
                   ⚠️ <strong>One Room Policy:</strong> Students can only book one room at a time. Please contact admin if you need to change rooms.

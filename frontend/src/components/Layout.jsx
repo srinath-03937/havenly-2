@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
       <TopBar />
       <div className="flex flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 min-w-0 overflow-y-auto">
+        <main className="flex-1 min-w-0 overflow-y-auto md:ml-0">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             {children}
           </div>

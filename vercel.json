@@ -9,18 +9,8 @@
       }
     },
     {
-      "src": "backend/api/simple.js",
+      "src": "backend/api/server.js",
       "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/api/simple.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/dist/$1"
     }
   ],
   "env": {

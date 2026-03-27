@@ -15,54 +15,58 @@ try {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const databaseURL = process.env.FIREBASE_DATABASE_URL;
   
-  if (!projectId || !privateKey || !clientEmail) {
-    throw new Error('Missing Firebase credentials in environment variables');
+  // Only initialize Firebase if all credentials are available
+  if (projectId && privateKey && clientEmail && databaseURL) {
+    // Clean up the private key
+    let cleanPrivateKey = privateKey;
+    
+    // Remove surrounding quotes if present
+    if (cleanPrivateKey.startsWith('"') && cleanPrivateKey.endsWith('"')) {
+      cleanPrivateKey = cleanPrivateKey.slice(1, -1);
+    }
+    
+    // Replace \n with actual newlines
+    cleanPrivateKey = cleanPrivateKey.replace(/\\n/g, '\n');
+    
+    // Ensure proper BEGIN and END lines
+    if (!cleanPrivateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+      cleanPrivateKey = '-----BEGIN PRIVATE KEY-----\n' + cleanPrivateKey;
+    }
+    if (!cleanPrivateKey.includes('-----END PRIVATE KEY-----')) {
+      cleanPrivateKey = cleanPrivateKey + '\n-----END PRIVATE KEY-----';
+    }
+    
+    cleanPrivateKey = cleanPrivateKey.trim();
+    
+    console.log('Initializing Firebase with project:', projectId);
+    
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: projectId,
+        privateKey: cleanPrivateKey,
+        clientEmail: clientEmail
+      }),
+      databaseURL: databaseURL
+    });
+    
+    console.log('Firebase initialized successfully');
+  } else {
+    console.warn('Firebase credentials not found in environment variables - skipping Firebase initialization');
   }
-  
-  // Clean up the private key
-  let cleanPrivateKey = privateKey;
-  
-  // Remove surrounding quotes if present
-  if (cleanPrivateKey.startsWith('"') && cleanPrivateKey.endsWith('"')) {
-    cleanPrivateKey = cleanPrivateKey.slice(1, -1);
-  }
-  
-  // Replace \n with actual newlines
-  cleanPrivateKey = cleanPrivateKey.replace(/\\n/g, '\n');
-  
-  // Ensure proper BEGIN and END lines
-  if (!cleanPrivateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-    cleanPrivateKey = '-----BEGIN PRIVATE KEY-----\n' + cleanPrivateKey;
-  }
-  if (!cleanPrivateKey.includes('-----END PRIVATE KEY-----')) {
-    cleanPrivateKey = cleanPrivateKey + '\n-----END PRIVATE KEY-----';
-  }
-  
-  cleanPrivateKey = cleanPrivateKey.trim();
-  
-  console.log('Initializing Firebase with project:', projectId);
-  
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: projectId,
-      privateKey: cleanPrivateKey,
-      clientEmail: clientEmail
-    }),
-    databaseURL: databaseURL
-  });
-  
-  console.log('Firebase initialized successfully');
 } catch (error) {
   console.error('Firebase initialization error:', error.message);
-  console.error('Environment variables check:');
-  console.error('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? 'SET' : 'NOT SET');
-  console.error('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? 'SET' : 'NOT SET');
-  console.error('FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? 'SET' : 'NOT SET');
-  console.error('FIREBASE_DATABASE_URL:', process.env.FIREBASE_DATABASE_URL ? 'SET' : 'NOT SET');
-  process.exit(1);
+  // Don't exit process, just log the error for Vercel compatibility
 }
 
-const db = admin.firestore();
+// Initialize Firestore only if Firebase is initialized
+let db;
+try {
+  db = admin.firestore();
+  console.log('Firebase Firestore connected');
+} catch (error) {
+  console.warn('Firestore not available - using mock database');
+  db = null;
+}
 
 // Create Express app
 const app = express();

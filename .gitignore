@@ -15,6 +15,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# API environment variables
+api/.env
+frontend/.env
+
 # IDE
 .vscode/
 .idea/

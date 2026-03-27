@@ -332,10 +332,10 @@ const StudentRooms = () => {
               <div className="bg-indigo-50 rounded-lg p-4">
                 <h4 className="font-semibold text-indigo-900 mb-2">Room Details</h4>
                 <div className="text-sm text-indigo-700 space-y-1">
-                  <p>Room {paymentPreview.room.room_number}, Wing {paymentPreview.room.wing}</p>
-                  <p>Type: {paymentPreview.room.type}</p>
-                  <p>Capacity: {paymentPreview.room.capacity} person(s)</p>
-                  <p>Occupancy: {paymentPreview.room.occupancy}/{paymentPreview.room.capacity}</p>
+                  <p>Room {paymentPreview?.room?.room_number || 'N/A'}, Wing {paymentPreview?.room?.wing || 'N/A'}</p>
+                  <p>Type: {paymentPreview?.room?.type || 'N/A'}</p>
+                  <p>Capacity: {paymentPreview?.room?.capacity || 0} person(s)</p>
+                  <p>Occupancy: {paymentPreview?.room?.occupancy || 0}/{paymentPreview?.room?.capacity || 0}</p>
                 </div>
               </div>
 
@@ -345,13 +345,16 @@ const StudentRooms = () => {
                 <div className="text-sm text-green-700 space-y-1">
                   <div className="flex items-center justify-between">
                     <span>Amount:</span>
-                    <span className="font-bold text-lg">₹{paymentPreview.payment.amount}</span>
+                    <span className="font-bold text-lg">₹{paymentPreview?.bookingDetails?.amount || 0}</span>
                   </div>
                   <div className="flex items-center">
                     <Calendar size={16} className="mr-2 flex-shrink-0" />
-                    <span>{paymentPreview.payment.month}</span>
+                    <span>{paymentPreview?.bookingDetails?.month || 'N/A'}</span>
                   </div>
-                  <p className="text-xs text-green-600 mt-2">{paymentPreview.payment.description}</p>
+                  <p className="text-xs text-green-600 mt-2">
+                    Room Type: {paymentPreview?.bookingDetails?.type || 'N/A'} | 
+                    Available Spots: {paymentPreview?.bookingDetails?.availableSpots || 0}
+                  </p>
                 </div>
               </div>
 
